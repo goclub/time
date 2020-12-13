@@ -11,13 +11,13 @@ import (
 func ExampleParse() {
 	log.Print("ExampleParse")
 	year, err := xtime.ParseChinaYear("2020") ; if err != nil {panic(err)}
-	log.Print(year.String())
+	log.Print(year.String()) // 2020-01-01 00:00:00 +0800 CST
 	yearAndMonth, err := xtime.ParseChinaYearAndMonth("2020-11") ; if err != nil {panic(err)}
-	log.Print(yearAndMonth.String())
+	log.Print(yearAndMonth.String()) // 2020-11-01 00:00:00 +0800 CST
 	date, err := xtime.ParseChinaDate("2020-11-11") ; if err != nil {panic(err)}
-	log.Print(date.String())
+	log.Print(date.String()) // 2020-11-11 00:00:00 +0800 CST
 	sometime, err := xtime.ParseChinaTime("2020-11-11 21:52:24") ; if err != nil {panic(err)}
-	log.Print(sometime.String())
+	log.Print(sometime.String()) // 2020-11-11 21:52:24 +0800 CST
 }
 func ExampleFormat() {
 	log.Print("ExampleFormat")
@@ -35,31 +35,31 @@ func ExampleLocation() {
 // 直接使用 time.Time 作为json 字段时因为 time.Time{}.UnmarshalJSON() 和 time.Time{}.MarshalJSON() 的原因会以 time.RFC3339 格式作为 layout
 func ExampleJSON_RFC3339() {
 	log.Print("ExampleJSON_RFC3339")
-	reqeust := struct {
+	request := struct {
 		Time time.Time `json:"time"`
 	}{}
-	err := xjson.Unmarshal([]byte(`{"time": "2020-12-31T23:23:23Z"}`), &reqeust) ; if err != nil {panic(err)}
-	log.Printf("reqeust: %+v", reqeust)
+	err := xjson.Unmarshal([]byte(`{"time": "2020-12-31T23:23:23Z"}`), &request) ; if err != nil {panic(err)}
+	log.Printf("request: %+v", request) // request: {Time:2020-12-31 23:23:23 +0000 UTC}
 
 	response := struct {
 		Time time.Time `json:"time"`
 	}{Time: time.Date(2020,12,31,23,23,23, 0,time.UTC)}
 	data, err := xjson.Marshal(response) ; if err != nil {panic(err)}
-	log.Print("response json : " + string(data)) // {"time":"2020-12-31T23:23:23Z"}
+	log.Print("response json : " + string(data)) // response json : {"time":"2020-12-31T23:23:23Z"}
 }
 func ExampleJSONChinaTime () {
 	log.Print("ExampleJSONChinaTime")
-	reqeust := struct {
+	request := struct {
 		Time xtime.ChinaTime `json:"time"`
 	}{}
-	err := xjson.Unmarshal([]byte(`{"time": "2020-12-31 23:23:23"}`), &reqeust) ; if err != nil {panic(err)}
-	log.Printf("reqeust: %+v", reqeust)
+	err := xjson.Unmarshal([]byte(`{"time": "2020-12-31 23:23:23"}`), &request) ; if err != nil {panic(err)}
+	log.Printf("request: %+v", request) // request: {Time:2020-12-31 23:23:23 +0800 CST}
 
 	response := struct {
 		Time xtime.ChinaTime `json:"time"`
 	}{Time: xtime.NewChinaTime(time.Date(2020,12,31,23,23,23, 0,time.UTC))}
 	data, err := xjson.Marshal(response) ; if err != nil {panic(err)}
-	log.Print("response json : " + string(data)) // {"time":"2020-12-31 23:23:23"}
+	log.Print("response json : " + string(data)) // response json : {"time":"2021-01-01 07:23:23"}
 }
 func TestExample(t *testing.T) {
 	ExampleFormat()
