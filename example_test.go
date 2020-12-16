@@ -75,8 +75,8 @@ func ExampleJSON_RFC3339() {
 	data, err := xjson.Marshal(response) ; if err != nil {panic(err)}
 	log.Print("response json : " + string(data)) // response json : {"time":"2020-12-31T23:23:23Z"}
 }
-func ExampleNewChinaTime () {
-	log.Print("ExampleNewChinaTime")
+func ExampleChinaTime () {
+	log.Print("ExampleChinaTime")
 	request := struct {
 		Time xtime.ChinaTime `json:"time"`
 	}{}
