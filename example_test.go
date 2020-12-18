@@ -82,7 +82,9 @@ func ExampleChinaTime () {
 	}{}
 	err := xjson.Unmarshal([]byte(`{"time": "2020-12-31 23:23:23"}`), &request) ; if err != nil {panic(err)}
 	log.Printf("request: %+v", request) // request: {Time:2020-12-31 23:23:23 +0800 CST}
-
+	var sometime time.Time
+	sometime = request.Time.Time
+	log.Print(sometime)
 	response := struct {
 		Time xtime.ChinaTime `json:"time"`
 	}{Time: xtime.NewChinaTime(time.Date(2020,12,31,23,23,23, 0,time.UTC))}
@@ -90,5 +92,4 @@ func ExampleChinaTime () {
 	log.Print("response json : " + string(data)) // response json : {"time":"2021-01-01 07:23:23"}
 }
 func TestExample(t *testing.T) {
-
 }
