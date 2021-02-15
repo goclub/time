@@ -1,4 +1,4 @@
-# time
+# xtime
 
 ```go
 import "github.com/goclub/time"
