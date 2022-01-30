@@ -1,3 +1,8 @@
+---
+permalink: /
+sidebarBasedOnContent: true
+---
+
 # xtime
 
 ```go
