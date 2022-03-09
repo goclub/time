@@ -4,14 +4,14 @@ import "time"
 
 
 func ParseChinaYear(value string) (t time.Time, err error) {
-	return time.ParseInLocation(layoutYear, value, LocationChina)
+	return time.ParseInLocation(LayoutYear, value, LocationChina)
 }
 func ParseChinaYearAndMonth(value string) (t time.Time, err error) {
-	return time.ParseInLocation(layoutYearAndMonth, value, LocationChina)
+	return time.ParseInLocation(LayoutYearAndMonth, value, LocationChina)
 }
 func ParseChinaDate(value string) (t time.Time, err error) {
-	return time.ParseInLocation(layoutDate, value, LocationChina)
+	return time.ParseInLocation(LayoutDate, value, LocationChina)
 }
 func ParseChinaTime(value string) (t time.Time, err error) {
-	return time.ParseInLocation(layoutTime, value, LocationChina)
+	return time.ParseInLocation(LayoutTime, value, LocationChina)
 }

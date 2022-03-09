@@ -2,17 +2,17 @@ package xtime
 
 import "time"
 func FormatChinaYear(t time.Time) string {
-	return t.In(LocationChina).Format(layoutYear)
+	return t.In(LocationChina).Format(LayoutYear)
 }
 func FormatChinaYearAndMonth(t time.Time) string {
-	return t.In(LocationChina).Format(layoutYearAndMonth)
+	return t.In(LocationChina).Format(LayoutYearAndMonth)
 }
 func FormatChinaTime(t time.Time) string {
-	return t.In(LocationChina).Format(layoutTime)
+	return t.In(LocationChina).Format(LayoutTime)
 }
 func FormatChinaDate(t time.Time) string {
-	return t.In(LocationChina).Format(layoutDate)
+	return t.In(LocationChina).Format(LayoutDate)
 }
 func FormatChinaHourMinuteSecond(t time.Time) string {
-	return t.In(LocationChina).Format(layoutHourMinuteSecond)
+	return t.In(LocationChina).Format(LayoutHourMinuteSecond)
 }
