@@ -5,22 +5,21 @@ import (
 	"time"
 )
 
-type InRangeTimeData struct {
+type Range struct {
 	Begin  time.Time
 	End    time.Time
-	Target time.Time
 }
-func InRangeTime(d InRangeTimeData) (in bool) {
-	begin := d.Begin
-	end := d.End
-	if d.Begin.After(d.End) {
-		begin = d.End
-		end = d.Begin
-		log.Print("goclub/time: InRangeTime() fixed begin and end")
+func InRange(target time.Time, r Range) (in bool) {
+	begin := r.Begin
+	end := r.End
+	if r.Begin.After(r.End) {
+		begin = r.End
+		end = r.Begin
+		log.Print("goclub/time: InRange(target time.Time, r Range) r.Begin can not  be after r.End, InRange() already replacement they")
 	}
 	// begin <= target <= end -> true
-	if ( begin.Before(d.Target) || begin.Equal(d.Target) ) &&
-		( d.Target.Before(end) || d.Target.Equal(end) ) {
+	if ( begin.Before(target) || begin.Equal(target) ) &&
+		( target.Before(end) || target.Equal(end) ) {
 		in = true
 		return
 	}
