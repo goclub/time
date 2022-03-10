@@ -68,13 +68,20 @@ func TestInRangeTime(t *testing.T) {
 		In bool
 	}
 	/*
-		1 in 在范围内
-		2 F in left 不在范围内, 并小于开始时间
-		3 F in right 不在范围内, 并大于结束时间
+		a begin=end
+		b begin<end
+		c begin>end
 
-		4 begin=end
-		5 begin<end
-		6 begin>end
+		1 in 在范围内
+		2 in left 在范围内, 并等于开始时间
+		3 in right 在范围内, 并等于结束时间
+		4 F in left 不在范围内, 并小于开始时间
+		5 F in right 不在范围内, 并大于结束时间
+
+		共13种情况
+		a 1,4,5
+		b 1,2,3,4,5
+		c 1,2,3,4,5
 	*/
 	dataList := []Date{
 		// 1 in 4 begin=end
