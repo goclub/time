@@ -15,104 +15,60 @@ func TestInRangeTime(t *testing.T) {
 	time5 := time1.Add(4*time.Second)
 
 	type Date struct {
-		xtime.InRangeTimeData
+		Time []time.Time // begin, end, target
 		In bool
 	}
 	/*
-		1 in 在范围内
-		2 F in left 不在范围内, 并小于开始时间
-		3 F in right 不在范围内, 并大于结束时间
+		a begin=end
+		b begin<end
+		c begin>end
 
-		4 begin=end
-		5 begin<end
-		6 begin>end
+		1 in 在范围内
+		2 in left 在范围内, 并等于开始时间
+		3 in right 在范围内, 并等于结束时间
+		4 F in left 不在范围内, 并小于开始时间
+		5 F in right 不在范围内, 并大于结束时间
+
+		共13种情况
+		a 1,4,5
+		b 1,2,3,4,5
+		c 1,2,3,4,5
 	*/
 	dataList := []Date{
-		// 1 in 4 begin=end
-		{
-			InRangeTimeData: xtime.InRangeTimeData{
-				Begin:  time2,
-				End:    time2,
-				Target: time2,
-			},
-			In:              true,
-		},
-		// 1 in 5 begin<end
-		{
-			InRangeTimeData: xtime.InRangeTimeData{
-				Begin:  time2,
-				End:    time4,
-				Target: time3,
-			},
-			In:              true,
-		},
-		// 1 in 6 begin>end
-		{
-			InRangeTimeData: xtime.InRangeTimeData{
-				Begin:  time4,
-				End:    time2,
-				Target: time3,
-			},
-			In:              true,
-		},
-		// 2 F in left 4 begin=end
-		{
-			InRangeTimeData: xtime.InRangeTimeData{
-				Begin:  time2,
-				End:    time2,
-				Target: time1,
-			},
-			In:              false,
-		},
-		// 2 F in left 5 begin<end
-		{
-			InRangeTimeData: xtime.InRangeTimeData{
-				Begin:  time2,
-				End:    time4,
-				Target: time1,
-			},
-			In:              false,
-		},
-		// 2 F in left 6 begin>end
-		{
-			InRangeTimeData: xtime.InRangeTimeData{
-				Begin:  time4,
-				End:    time2,
-				Target: time1,
-			},
-			In:              false,
-		},
-		// 3 F in right 4 begin=end
-		{
-			InRangeTimeData: xtime.InRangeTimeData{
-				Begin:  time3,
-				End:    time3,
-				Target: time5,
-			},
-			In:              false,
-		},
-		// 3 F in right 5 begin<end
-		{
-			InRangeTimeData: xtime.InRangeTimeData{
-				Begin:  time2,
-				End:    time4,
-				Target: time5,
-			},
-			In:              false,
-		},
-		// 3 F in right 6 begin>end
-		{
-			InRangeTimeData: xtime.InRangeTimeData{
-				Begin:  time4,
-				End:    time2,
-				Target: time5,
-			},
-			In:              false,
-		},
+		// a 1
+		{ []time.Time{time2, time2, time2}, true },
+		// a 4
+		{ []time.Time{time2, time2, time1}, false },
+		// a 5
+		{ []time.Time{time3, time3, time5}, false },
+		// b 1
+		{ []time.Time{time2, time4, time3}, true },
+		// b 2
+		{ []time.Time{time2, time4, time2}, true },
+		// b 3
+		{ []time.Time{time2, time4, time4}, true },
+		// b 4
+		{ []time.Time{time2, time4, time1}, false },
+		// b 5
+		{ []time.Time{time2, time4, time5}, false },
+		// c 1
+		{ []time.Time{time4, time2, time3}, true },
+		// c 2
+		{ []time.Time{time4, time2, time2}, true },
+		// c 3
+		{ []time.Time{time4, time2, time4}, true },
+		//  c 4
+		{ []time.Time{time4, time2, time1}, false },
+		// c 5
+		{ []time.Time{time4, time2, time5}, false },
 	}
 
 	for k, v := range dataList {
-		in := xtime.InRangeTime(v.InRangeTimeData)
+		in := xtime.InRangeTime(xtime.InRangeTimeData{
+			Begin:  v.Time[0],
+			End:    v.Time[1],
+			Target: v.Time[2],
+		})
 		assert.Equal(t, v.In, in, k+1)
 	}
 }
