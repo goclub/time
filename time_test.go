@@ -1,6 +1,9 @@
 package xtime_test
 
 import (
+	"database/sql"
+	"encoding/json"
+	_ "github.com/go-sql-driver/mysql"
 	xtime "github.com/goclub/time"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -174,4 +177,190 @@ func TestInRangeTime(t *testing.T) {
 		})
 		assert.Equal(t, v.In, in, k+1)
 	}
+}
+
+
+func TestDateSQL(t *testing.T) {
+	func() struct{} {
+		db, err := sql.Open("mysql", "root:somepass@(127.0.0.1:3306)/goclub_time") ; if err != nil {
+			assert.NoError(t, err)
+		}
+		_, err = db.Exec(`CREATE TABLE IF NOT EXISTS date (
+		  id int(11) unsigned NOT NULL AUTO_INCREMENT,
+		  date date NOT NULL,
+		  null_date date DEFAULT NULL,
+		  PRIMARY KEY (id)
+		) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4;`) ; assert.NoError(t, err)
+
+		// insert 2022-01-01 null
+		{
+			sql := "INSERT INTO `date` (`date`, `null_date`) VALUES (?, ?)"
+			result, err := db.Exec(sql, xtime.NewDate(2022,01,01), xtime.NullDate{}) ; if err != nil {
+			assert.NoError(t, err)
+		}
+			id, err := result.LastInsertId() ; if err != nil {
+			assert.NoError(t, err)
+		}
+			sql = "SELECT `date` ,`null_date` FROM `date` WHERE `id` = ?"
+			row := db.QueryRow(sql, id)
+			value := xtime.Date{}
+			nullValue := xtime.NullDate{}
+			err = row.Scan(&value, &nullValue) ; if err != nil {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t,value.String(), "2022-01-01")
+			assert.Equal(t,nullValue, xtime.NullDate{})
+			{
+				row := db.QueryRow("SELECT `null_date` FROM `date` WHERE `id` = ?", id)
+				value := xtime.Date{}
+				err = row.Scan(&value)
+				assert.Equal(t,err.Error(), `sql: Scan error on column index 0, name "null_date": unsupported NULL xtime.date value, maybe you should use xtime.NullDate`)
+			}
+		}
+		// insert 2022-01-01 2022-01-01
+		{
+			result, err := db.Exec("INSERT INTO `date` (`date`, `null_date`) VALUES (?, ?)", xtime.NewDate(2022,01,01), xtime.NewNullDate(2022,01,02)) ; if err != nil {
+			assert.NoError(t, err)
+		}
+			id, err := result.LastInsertId() ; if err != nil {
+			assert.NoError(t, err)
+		}
+			row := db.QueryRow("SELECT `date` ,`null_date` FROM `date` WHERE `id` = ?", id)
+			value := xtime.Date{}
+			nullValue := xtime.NullDate{}
+			err = row.Scan(&value, &nullValue) ; if err != nil {
+			assert.NoError(t, err)
+		}
+			assert.Equal(t,value.String(), "2022-01-01")
+			assert.Equal(t,nullValue, xtime.NewNullDate(2022,01,02))
+		}
+	    return struct{}{}
+	}()
+}
+func TestNowDate(t *testing.T) {
+	date := xtime.NowDate(xtime.LocationChina)
+	y,m,d := time.Now().In(xtime.LocationChina).Date()
+	assert.Equal(t,date, xtime.NewDate(y,m,d))
+}
+func TestNewDate(t *testing.T) {
+	date := xtime.NewDate(2022,01,01)
+	assert.Equal(t,date, xtime.Date{2022,01,01})
+	{
+		date := xtime.NewNullDate(2022,01,01)
+		assert.Equal(t,date, xtime.NewNullDate(2022,01,01))
+		assert.Equal(t,date.Date(), xtime.Date{2022,01,01})
+		assert.Equal(t,date.Valid(), true)
+		assert.Equal(t,xtime.NullDate{}.Date(), xtime.Date{})
+		assert.Equal(t,xtime.NullDate{}.Valid(), false)
+	}
+}
+
+func TestNewDateForTime(t *testing.T) {
+	date := xtime.NewDateForTime(time.Date(2022,01,01,0, 0,0,0,xtime.LocationChina))
+	assert.Equal(t,date, xtime.Date{2022,01,01})
+}
+func TestParseDate(t *testing.T) {
+	date, err := xtime.NewDateForString("2022-01-01") ; if err != nil {
+	    return
+	}
+	assert.Equal(t,date, xtime.Date{2022,01,01})
+	_, err = xtime.NewDateForString("2022-01-0")
+	 assert.Errorf(t, err, `parsing time "2022-01-0" as "2006-01-02": cannot parse "0" as "02"`)
+}
+
+func TestDate_UnmarshalJSON(t *testing.T) {
+	func() struct{} {
+		{
+			v := struct {
+				Date xtime.Date `json:"date"`
+			}{}
+			err := json.Unmarshal([]byte(`{"date":"2022-11-11"}`), &v) ; assert.NoError(t, err)
+			assert.Equal(t,v.Date, xtime.Date{2022,11,11})
+		}
+		{
+			v := struct {
+				Date xtime.Date `json:"date"`
+			}{}
+			err := json.Unmarshal([]byte(`{"date":"2022-11-1"}`), &v)
+			assert.Errorf(t, err, `parsing time "2022-11-1" as "2006-01-02": cannot parse "1" as "02"`)
+		}
+	    return struct{}{}
+	}()
+}
+func TestDate_MarshalJSON(t *testing.T) {
+	v := struct {
+		Date xtime.Date `json:"date"`
+	}{
+		Date: xtime.NewDate(2022,11,11),
+	}
+	data, err := json.Marshal(v) ; assert.NoError(t, err)
+	assert.Equal(t,string(data),`{"date":"2022-11-11"}`)
+}
+func TestDate_Time(t *testing.T) {
+	date := xtime.NewDate(2022,11,11)
+	dateTime := date.Time(xtime.LocationChina)
+	assert.Equal(t,dateTime, time.Date(2022,11,11,0, 0,0,0,xtime.LocationChina))
+}
+
+func TestDate_ChinaTime(t *testing.T) {
+	date := xtime.NewDate(2022,11,11)
+	dateTime := date.ChinaTime()
+	assert.Equal(t,dateTime, xtime.NewChinaTime(time.Date(2022,11,11,0, 0,0,0,xtime.LocationChina)))
+}
+func TestDate_String(t *testing.T) {
+	date := xtime.NewDate(2022,11,11)
+	assert.Equal(t,date.String(), "2022-11-11")
+}
+func TestDate_Value(t *testing.T) {
+	date := xtime.NewDate(2022,11,11)
+	v, err := date.Value() ; assert.NoError(t, err)
+	assert.Equal(t,v, "2022-11-11")
+}
+func TestNullDate_MarshalJSON(t *testing.T) {
+	func()  struct{}{
+		{
+			v := struct {
+				Date xtime.NullDate `json:"date"`
+			}{
+				Date: xtime.NewNullDate(2022,11,11),
+			}
+			data, err := json.Marshal(v) ; assert.NoError(t, err)
+			assert.Equal(t,string(data),`{"date":"2022-11-11"}`)
+		}
+		{
+			v := struct {
+				Date xtime.NullDate `json:"date"`
+			}{
+				Date: xtime.NullDate{},
+			}
+			data, err := json.Marshal(v) ; assert.NoError(t, err)
+			assert.Equal(t,string(data),`{"date":null}`)
+		}
+		return struct{}{}
+	}()
+}
+func TestNullDate_UnmarshalJSON(t *testing.T) {
+	func() struct {} {
+		{
+			v := struct {
+				Date xtime.NullDate `json:"date"`
+			}{}
+			err := json.Unmarshal([]byte(`{"date":null}`), &v) ; assert.NoError(t, err)
+			assert.Equal(t,v.Date, xtime.NullDate{})
+		}
+		{
+			v := struct {
+				Date xtime.NullDate `json:"date"`
+			}{
+			}
+			err := json.Unmarshal([]byte(`{"date":"2022-01-01"}`), &v) ; assert.NoError(t, err)
+			assert.Equal(t,v.Date, xtime.NewNullDate(2022,01,01))
+		}
+		return struct{}{}
+	}()
+
+}
+func TestNullDate_String(t *testing.T) {
+	assert.Equal(t,xtime.NewNullDate(2022,01,01).String(), "2022-01-01")
+	assert.Equal(t,xtime.NullDate{}.String(), "null")
 }

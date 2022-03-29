@@ -1,7 +1,11 @@
 package xtime
 
 import (
+	"database/sql/driver"
+	"fmt"
+	xerr "github.com/goclub/error"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -25,5 +29,135 @@ func InRange(target time.Time, r Range) (in bool) {
 	}
 	return
 }
+type Date struct {
+	Year int
+	Month time.Month
+	Day int
+}
+func NowDate(loc *time.Location) Date {
+	year, month, day := time.Now().In(loc).Date()
+	return Date{
+		Year: year,
+		Month: month,
+		Day: day,
+	}
+}
+func NewDate(year int, month time.Month, day int) Date {
+	return Date{
+		year, month,day,
+	}
+}
+func NewDateForTime(t time.Time) Date {
+	return NewDate(t.Date())
+}
+func NewDateForString(value string) (d Date, err error) {
+	t, err := time.Parse(LayoutDate, value) ; if err != nil {
+		err = xerr.WithStack(err)
+	    return
+	}
+	return NewDateForTime(t), nil
+}
 
-// func inRangeDate(begin string, end string, target string) bool
+func (d *Date) UnmarshalJSON(b []byte) error {
+	value, err := strconv.Unquote(string(b)) ; if err != nil {
+		return xerr.WithStack(err)
+	}
+	date, err := NewDateForString(value) ; if err != nil {
+		return xerr.WithStack(err)
+	}
+	*d = date
+	return err
+}
+
+func (d Date) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + d.String() + `"`), nil
+}
+func (d Date) Time(loc *time.Location) time.Time {
+	return time.Date(d.Year, d.Month, d.Day, 0,0,0,0, loc)
+}
+func (d Date) ChinaTime() ChinaTime {
+	return NewChinaTime(d.Time(LocationChina))
+}
+func (d Date) String() string {
+	return time.Date(d.Year, d.Month, d.Day, 0,0,0,0, time.UTC).Format(LayoutDate)
+}
+func (d Date) Value() (driver.Value, error) {
+	return d.String(), nil
+}
+func (d *Date) Scan(value interface{}) (err error) {
+	if value == nil {
+		return xerr.New("unsupported NULL xtime.date value, maybe you should use xtime.NullDate")
+	}
+	var date Date
+	date, err = NewDateForString(fmt.Sprintf("%s", value)) ; if err != nil {
+		return
+	}
+	*d = date
+	return
+}
+
+type NullDate struct {
+	date  Date
+	valid bool
+}
+
+func (v NullDate) Date() Date {
+	return v.date
+}
+func (v *NullDate) SetDate(date Date) {
+	v.date = date
+}
+func (v NullDate) Valid() bool {
+	return v.valid
+}
+func NewNullDate(year int, month time.Month, day int) NullDate {
+	return NullDate{
+		date:  NewDate(year, month, day),
+		valid: true,
+	}
+}
+
+func (d *NullDate) UnmarshalJSON(b []byte) error {
+	if string(b) == "null" || string(b) == "" {
+		d.valid = false
+		return nil
+	}
+	date := Date{}
+	err := date.UnmarshalJSON(b) ; if err != nil {
+	    return xerr.WithStack(err)
+	}
+	*d = NullDate{
+		date:  date,
+		valid: true,
+	}
+	return err
+}
+
+func (d NullDate) MarshalJSON() ([]byte, error) {
+	if d.valid {
+		return d.date.MarshalJSON()
+	} else {
+		return []byte(`null`), nil
+	}
+}
+func (d NullDate) String() string {
+	if d.valid {
+		return d.date.String()
+	}
+	return "null"
+}
+
+func (d NullDate) Value() (driver.Value, error) {
+	if d.valid {
+		return d.date.Value()
+	}
+	return nil, nil
+}
+func (d *NullDate) Scan(value interface{}) error {
+	if value == nil {
+		d.valid = false
+		return nil
+	}
+	d.valid = true
+	return d.date.Scan(value)
+}

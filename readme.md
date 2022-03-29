@@ -30,9 +30,12 @@ Format 也有相同的问题。
 
 当 json 传递的时间格式不是 RFC3339 而是中国时区年月日时分秒 `2006-01-02 15:04:05`，可以使用 `xtime.ChinaTime` 解析和转换
 
-## UnixMilli
+## Date
 
-```go
-sometime := time.Date(2020,12,31,23,23,23, 0,LocationChina)
-		assert.Equal(t, UnixMilli(sometime), int64(1609428203000), )
-```
+在数据库中或者前后端数据传递中都会用到日期, `xtime.Date` 和 `xtime.NullDate` 支持 JSON 和SQL 解析
+
+并提供 `xtime.NewDate` `xtime.NewDateForTime` `xtime.NewDateForString` 等方法创建数据
+
+> 注意 xtime.Date 表达的是日期所以无需时区,但是 xtime.Date 转换为 time.Time 时候需要指定时区
+
+
