@@ -47,22 +47,22 @@ func NewDate(year int, month time.Month, day int) Date {
 		year, month,day,
 	}
 }
-func NewDateForTime(t time.Time) Date {
+func NewDateFromTime(t time.Time) Date {
 	return NewDate(t.Date())
 }
-func NewDateForString(value string) (d Date, err error) {
+func NewDateFromString(value string) (d Date, err error) {
 	t, err := time.Parse(LayoutDate, value) ; if err != nil {
 		err = xerr.WithStack(err)
 	    return
 	}
-	return NewDateForTime(t), nil
+	return NewDateFromTime(t), nil
 }
 
 func (d *Date) UnmarshalJSON(b []byte) error {
 	value, err := strconv.Unquote(string(b)) ; if err != nil {
 		return xerr.WithStack(err)
 	}
-	date, err := NewDateForString(value) ; if err != nil {
+	date, err := NewDateFromString(value) ; if err != nil {
 		return xerr.WithStack(err)
 	}
 	*d = date
@@ -89,7 +89,7 @@ func (d *Date) Scan(value interface{}) (err error) {
 		return xerr.New("unsupported NULL xtime.date value, maybe you should use xtime.NullDate")
 	}
 	var date Date
-	date, err = NewDateForString(fmt.Sprintf("%s", value)) ; if err != nil {
+	date, err = NewDateFromString(fmt.Sprintf("%s", value)) ; if err != nil {
 		return
 	}
 	*d = date

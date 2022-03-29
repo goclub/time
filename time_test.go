@@ -256,15 +256,15 @@ func TestNewDate(t *testing.T) {
 }
 
 func TestNewDateForTime(t *testing.T) {
-	date := xtime.NewDateForTime(time.Date(2022,01,01,0, 0,0,0,xtime.LocChina))
+	date := xtime.NewDateFromTime(time.Date(2022,01,01,0, 0,0,0,xtime.LocChina))
 	assert.Equal(t,date, xtime.Date{2022,01,01})
 }
 func TestParseDate(t *testing.T) {
-	date, err := xtime.NewDateForString("2022-01-01") ; if err != nil {
+	date, err := xtime.NewDateFromString("2022-01-01") ; if err != nil {
 	    return
 	}
 	assert.Equal(t,date, xtime.Date{2022,01,01})
-	_, err = xtime.NewDateForString("2022-01-0")
+	_, err = xtime.NewDateFromString("2022-01-0")
 	 assert.Errorf(t, err, `parsing time "2022-01-0" as "2006-01-02": cannot parse "0" as "02"`)
 }
 

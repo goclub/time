@@ -34,7 +34,7 @@ Format 也有相同的问题。
 
 在数据库中或者前后端数据传递中都会用到日期, `xtime.Date` 和 `xtime.NullDate` 支持 JSON 和SQL 解析
 
-并提供 `xtime.NewDate` `xtime.NewDateForTime` `xtime.NewDateForString` 等方法创建数据
+并提供 `xtime.NewDate` `xtime.NewDateFromTime` `xtime.NewDateFromString` 等方法创建数据
 
 > 注意 xtime.Date 表达的是日期所以无需时区,但是 xtime.Date 转换为 time.Time 时候需要指定时区
 
