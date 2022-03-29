@@ -214,7 +214,7 @@ func TestDateSQL(t *testing.T) {
 				row := db.QueryRow("SELECT `null_date` FROM `date` WHERE `id` = ?", id)
 				value := xtime.Date{}
 				err = row.Scan(&value)
-				assert.Equal(t,err.Error(), `sql: Scan error on column index 0, name "null_date": unsupported NULL xtime.date value, maybe you should use xtime.NullDate`)
+				assert.Equal(t,err.Error(), `sql: Scan error on column index 0, name "null_date": unsupported NULL xtime.Date value, maybe you should use xtime.NullDate`)
 			}
 		}
 		// insert 2022-01-01 2022-01-01

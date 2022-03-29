@@ -86,7 +86,7 @@ func (d Date) Value() (driver.Value, error) {
 }
 func (d *Date) Scan(value interface{}) (err error) {
 	if value == nil {
-		return xerr.New("unsupported NULL xtime.date value, maybe you should use xtime.NullDate")
+		return xerr.New("unsupported NULL xtime.Date value, maybe you should use xtime.NullDate")
 	}
 	var date Date
 	date, err = NewDateFromString(fmt.Sprintf("%s", value)) ; if err != nil {
