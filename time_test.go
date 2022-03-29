@@ -238,8 +238,8 @@ func TestDateSQL(t *testing.T) {
 	}()
 }
 func TestNowDate(t *testing.T) {
-	date := xtime.NowDate(xtime.LocationChina)
-	y,m,d := time.Now().In(xtime.LocationChina).Date()
+	date := xtime.NowDate(xtime.LocChina)
+	y,m,d := time.Now().In(xtime.LocChina).Date()
 	assert.Equal(t,date, xtime.NewDate(y,m,d))
 }
 func TestNewDate(t *testing.T) {
@@ -256,7 +256,7 @@ func TestNewDate(t *testing.T) {
 }
 
 func TestNewDateForTime(t *testing.T) {
-	date := xtime.NewDateForTime(time.Date(2022,01,01,0, 0,0,0,xtime.LocationChina))
+	date := xtime.NewDateForTime(time.Date(2022,01,01,0, 0,0,0,xtime.LocChina))
 	assert.Equal(t,date, xtime.Date{2022,01,01})
 }
 func TestParseDate(t *testing.T) {
@@ -298,14 +298,14 @@ func TestDate_MarshalJSON(t *testing.T) {
 }
 func TestDate_Time(t *testing.T) {
 	date := xtime.NewDate(2022,11,11)
-	dateTime := date.Time(xtime.LocationChina)
-	assert.Equal(t,dateTime, time.Date(2022,11,11,0, 0,0,0,xtime.LocationChina))
+	dateTime := date.Time(xtime.LocChina)
+	assert.Equal(t,dateTime, time.Date(2022,11,11,0, 0,0,0,xtime.LocChina))
 }
 
 func TestDate_ChinaTime(t *testing.T) {
 	date := xtime.NewDate(2022,11,11)
 	dateTime := date.ChinaTime()
-	assert.Equal(t,dateTime, xtime.NewChinaTime(time.Date(2022,11,11,0, 0,0,0,xtime.LocationChina)))
+	assert.Equal(t,dateTime, xtime.NewChinaTime(time.Date(2022,11,11,0, 0,0,0,xtime.LocChina)))
 }
 func TestDate_String(t *testing.T) {
 	date := xtime.NewDate(2022,11,11)

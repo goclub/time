@@ -58,7 +58,7 @@ func ExampleFormatChinaHourMinuteSecond() {
 }
 
 func ExampleLocationChina() {
-	log.Print("now time is :" + time.Now().In(xtime.LocationChina).String())
+	log.Print("now time is :" + time.Now().In(xtime.LocChina).String())
 }
 // 直接使用 time.Time 作为json 字段时因为 time.Time{}.UnmarshalJSON() 和 time.Time{}.MarshalJSON() 的原因会以 time.RFC3339 格式作为 layout
 func ExampleJSON_RFC3339() {

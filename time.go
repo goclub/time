@@ -76,7 +76,7 @@ func (d Date) Time(loc *time.Location) time.Time {
 	return time.Date(d.Year, d.Month, d.Day, 0,0,0,0, loc)
 }
 func (d Date) ChinaTime() ChinaTime {
-	return NewChinaTime(d.Time(LocationChina))
+	return NewChinaTime(d.Time(LocChina))
 }
 func (d Date) String() string {
 	return time.Date(d.Year, d.Month, d.Day, 0,0,0,0, time.UTC).Format(LayoutDate)
@@ -103,9 +103,6 @@ type NullDate struct {
 
 func (v NullDate) Date() Date {
 	return v.date
-}
-func (v *NullDate) SetDate(date Date) {
-	v.date = date
 }
 func (v NullDate) Valid() bool {
 	return v.valid
