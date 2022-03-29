@@ -255,7 +255,7 @@ func TestNewDate(t *testing.T) {
 	}
 }
 
-func TestNewDateForTime(t *testing.T) {
+func TestNewDateFromTime(t *testing.T) {
 	date := xtime.NewDateFromTime(time.Date(2022,01,01,0, 0,0,0,xtime.LocChina))
 	assert.Equal(t,date, xtime.Date{2022,01,01})
 }
