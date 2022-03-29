@@ -158,3 +158,12 @@ func (d *NullDate) Scan(value interface{}) error {
 	d.valid = true
 	return d.date.Scan(value)
 }
+
+func LastSecondOfDate(t time.Time) time.Time {
+	y,m,d := t.Date()
+	return time.Date(y,m,d,23,59,59,999999999,t.Location())
+}
+func FirstSecondOfDate(t time.Time) time.Time {
+	y,m,d := t.Date()
+	return time.Date(y,m,d,0,0,0,0,t.Location())
+}

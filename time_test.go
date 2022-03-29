@@ -364,3 +364,12 @@ func TestNullDate_String(t *testing.T) {
 	assert.Equal(t,xtime.NewNullDate(2022,01,01).String(), "2022-01-01")
 	assert.Equal(t,xtime.NullDate{}.String(), "null")
 }
+
+func TestFirstSecondOfDate(t *testing.T) {
+	func() struct{} {
+	    sometime := time.Date(2022,01,01,12,12,12,88,xtime.LocChina)
+	    assert.Equal(t,xtime.FirstSecondOfDate(sometime), time.Date(2022,01,01,0,0,0,0,xtime.LocChina))
+		assert.Equal(t,xtime.LastSecondOfDate(sometime), time.Date(2022,01,01,23,59,59,999999999,xtime.LocChina))
+	    return struct{}{}
+	}()
+}

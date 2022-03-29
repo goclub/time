@@ -39,3 +39,18 @@ Format 也有相同的问题。
 > 注意 xtime.Date 表达的是日期所以无需时区,但是 xtime.Date 转换为 time.Time 时候需要指定时区
 
 
+## FirstSecondOfDate & LastSecondOfDate
+
+拿到指定日期的第一秒和最后一秒
+
+**看源码辅助理解**
+```go
+func LastSecondOfDate(t time.Time) time.Time {
+y,m,d := t.Date()
+return time.Date(y,m,d,23,59,59,999999999,t.Location())
+}
+func FirstSecondOfDate(t time.Time) time.Time {
+y,m,d := t.Date()
+return time.Date(y,m,d,0,0,0,0,t.Location())
+}
+```
