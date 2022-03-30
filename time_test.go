@@ -16,9 +16,13 @@ func TestInRangeTime2(t *testing.T) {
 	// 2000-01-01 00:00:01
 	t1 := time.Date(2000,1,1, 0,0,1,0, time.Local)
 	t2 := t1.Add(1 * time.Second)
+	_ = t2
 	t3 := t1.Add(2 * time.Second)
+	_ = t3
 	t4 := t1.Add(3 * time.Second)
+	_ = t4
 	t5 := t1.Add(4 * time.Second)
+	_ = t5
 	type Date struct {
 		Time []time.Time
 		In bool
@@ -52,7 +56,54 @@ func TestInRangeTime2(t *testing.T) {
 			Begin:  begin,
 			End:    end,
 		})
-		assert.Equalf(t, in, item.In, "[]time.Time{t%d, t%d, t%d}, %v, }", begin.Second(), target.Second(), end.Second(), item.In)
+		assert.Equalf(t, in, item.In, "Time: []time.Time{t%d, t%d, t%d}, %v, }", begin.Second(), target.Second(), end.Second(), item.In)
+	}
+}
+func TestInDateRangeTime(t *testing.T) {
+	// 2000-01-01
+	t1 := time.Date(2000,1,1, 0,0,0,0, time.Local)
+	t2 := t1.Add(1 * 24*time.Hour)
+	_ = t2
+	t3 := t1.Add(2 * 24*time.Hour)
+	_ = t3
+	t4 := t1.Add(3 * 24*time.Hour)
+	_ = t4
+	t5 := t1.Add(4 * 24*time.Hour)
+	_ = t5
+	type Date struct {
+		Time []time.Time
+		In bool
+	}
+	data := []Date{
+		// begin target end
+		// 2 * 2
+		{ []time.Time{t2, t1, t2}, false, },
+		{ []time.Time{t2, t2, t2}, true, },
+		{ []time.Time{t2, t3, t2}, false, },
+		// 2 * 3
+		{ []time.Time{t2, t1, t3}, false, },
+		{ []time.Time{t2, t2, t3}, true, },
+		{ []time.Time{t2, t3, t3}, true, },
+		// 2 * 4
+		{ []time.Time{t2, t1, t4}, false, },
+		{ []time.Time{t2, t2, t4}, true, },
+		{ []time.Time{t2, t3, t4}, true, },
+		{ []time.Time{t2, t4, t4}, true, },
+		{ []time.Time{t2, t5, t4}, false, },
+
+		// replacement begin & end
+		{ []time.Time{t3, t2, t1}, true, },
+		{ []time.Time{t3, t5, t1}, false, },
+	}
+	for _, item := range data {
+		begin := item.Time[0]
+		target := item.Time[1]
+		end := item.Time[2]
+		in := xtime.InRangeFromDate(target, xtime.DateRange{
+			Begin:  xtime.NewDateFromTime(begin),
+			End:    xtime.NewDateFromTime(end),
+		})
+		assert.Equalf(t, in, item.In, "Date: []time.Time{t%d, t%d, t%d}, %v, }", begin.Second(), target.Second(), end.Second(), item.In)
 	}
 }
 func TestInRangeTime(t *testing.T) {

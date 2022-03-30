@@ -56,3 +56,28 @@ y,m,d := t.Date()
 return time.Date(y,m,d,0,0,0,0,t.Location())
 }
 ```
+
+## InRange & InRangeFromDate
+
+`InRange` 和 `InRangeFromDate` 可以判断一个时间或者日期是否在指定范围内.
+
+```go
+
+xtime.InRangeFromDate(xtime.NewDate(2022,01,02), xtime.DateRange{
+    Begin:  xtime.NewDate(2022,01,01),
+    End:    xtime.NewDate(2022,01,03),
+}) // true
+xtime.InRangeFromDate(xtime.NewDate(2022,01,05), xtime.DateRange{
+Begin:  xtime.NewDate(2022,01,01),
+End:    xtime.NewDate(2022,01,03),
+}) // false
+
+
+var begin time.Time
+var end time.Time
+in := xtime.InRange(target, xtime.Range{
+    Begin:  begin,
+    End:    end,
+})
+```
+

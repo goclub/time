@@ -29,6 +29,18 @@ func InRange(target time.Time, r Range) (in bool) {
 	}
 	return
 }
+type DateRange struct {
+	Begin  Date
+	End    Date
+}
+func InRangeFromDate(target time.Time, r DateRange) (in bool) {
+	timeRange := Range{
+		Begin: FirstSecondOfDate(r.Begin.Time(target.Location())),
+		End:   LastSecondOfDate(r.End.Time(target.Location())),
+	}
+	log.Print(FirstSecondOfDate(r.Begin.Time(target.Location())),target, LastSecondOfDate(r.End.Time(target.Location())))
+	return InRange(target, timeRange)
+}
 type Date struct {
 	Year int
 	Month time.Month
