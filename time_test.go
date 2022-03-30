@@ -6,6 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	xtime "github.com/goclub/time"
 	"github.com/stretchr/testify/assert"
+	"net/url"
 	"testing"
 	"time"
 )
@@ -182,7 +183,12 @@ func TestInRangeTime(t *testing.T) {
 
 func TestDateSQL(t *testing.T) {
 	func() struct{} {
-		db, err := sql.Open("mysql", "root:somepass@(127.0.0.1:3306)/goclub_time") ; if err != nil {
+
+		db, err := sql.Open("mysql", "root:somepass@(127.0.0.1:3306)/goclub_time?" +url.Values{
+			"charset":   []string{"utf8"},
+			"parseTime": []string{"True"},
+			"loc":       []string{"Local"},
+		}.Encode()) ; if err != nil {
 			assert.NoError(t, err)
 		}
 		_, err = db.Exec(`CREATE TABLE IF NOT EXISTS date (

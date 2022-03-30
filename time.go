@@ -88,11 +88,16 @@ func (d *Date) Scan(value interface{}) (err error) {
 	if value == nil {
 		return xerr.New("unsupported NULL xtime.Date value, maybe you should use xtime.NullDate")
 	}
-	var date Date
-	date, err = NewDateFromString(fmt.Sprintf("%s", value)) ; if err != nil {
+	switch v := value.(type) {
+	case time.Time:
+		*d = NewDateFromTime(v)
+	default:
+		var date Date
+		date, err = NewDateFromString(fmt.Sprintf("%s", value)) ; if err != nil {
 		return
 	}
-	*d = date
+		*d = date
+	}
 	return
 }
 
