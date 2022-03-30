@@ -32,7 +32,9 @@ Format 也有相同的问题。
 
 ## Date
 
-在数据库中或者前后端数据传递中都会用到日期, `xtime.Date` 和 `xtime.NullDate` 支持 JSON 和SQL 解析
+在数据库中或者前后端数据传递中都会用到日期, `xtime.Date` 和 `xtime.NullDate` 支持 JSON 和SQL 解析 
+
+> 无论 sql 是否打开 `parseTime=true`, `xtime.Date` 都能正确解析日期
 
 并提供 `xtime.NewDate` `xtime.NewDateFromTime` `xtime.NewDateFromString` 等方法创建数据
 
