@@ -358,7 +358,16 @@ func TestDate_Time(t *testing.T) {
 	dateTime := date.Time(xtime.LocChina)
 	assert.Equal(t,dateTime, time.Date(2022,11,11,0, 0,0,0,xtime.LocChina))
 }
-
+func TestDate_LocalTime(t *testing.T) {
+	date := xtime.NewDate(2022,11,11)
+	dateTime := date.LocalTime()
+	assert.Equal(t,dateTime, time.Date(2022,11,11,0, 0,0,0,time.Local))
+}
+func TestDate_UTCTime(t *testing.T) {
+	date := xtime.NewDate(2022,11,11)
+	dateTime := date.UTCTime()
+	assert.Equal(t,dateTime, time.Date(2022,11,11,0, 0,0,0,time.UTC))
+}
 func TestDate_ChinaTime(t *testing.T) {
 	date := xtime.NewDate(2022,11,11)
 	dateTime := date.ChinaTime()

@@ -87,6 +87,12 @@ func (d Date) MarshalJSON() ([]byte, error) {
 func (d Date) Time(loc *time.Location) time.Time {
 	return time.Date(d.Year, d.Month, d.Day, 0,0,0,0, loc)
 }
+func (d Date) LocalTime() time.Time {
+	return d.Time(time.Local)
+}
+func (d Date) UTCTime() time.Time {
+	return d.Time(time.UTC)
+}
 func (d Date) ChinaTime() ChinaTime {
 	return NewChinaTime(d.Time(LocChina))
 }
