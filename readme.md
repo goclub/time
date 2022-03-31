@@ -63,11 +63,11 @@ return time.Date(y,m,d,0,0,0,0,t.Location())
 
 ```go
 
-xtime.InRangeFromDate(xtime.NewDate(2022,01,02), xtime.DateRange{
+xtime.InRangeFromDate(time.Date(2022,01,02,0,0,0,0, xtime.LocChina), xtime.DateRange{
     Begin:  xtime.NewDate(2022,01,01),
     End:    xtime.NewDate(2022,01,03),
 }) // true
-xtime.InRangeFromDate(xtime.NewDate(2022,01,05), xtime.DateRange{
+xtime.InRangeFromDate(time.Date(2022,01,05,0,0,0,0, xtime.LocChina), xtime.DateRange{
 Begin:  xtime.NewDate(2022,01,01),
 End:    xtime.NewDate(2022,01,03),
 }) // false
