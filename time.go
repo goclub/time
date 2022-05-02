@@ -10,9 +10,10 @@ import (
 )
 
 type Range struct {
-	Begin  time.Time
-	End    time.Time
+	Begin time.Time
+	End   time.Time
 }
+
 func InRange(target time.Time, r Range) (in bool) {
 	begin := r.Begin
 	end := r.End
@@ -22,17 +23,19 @@ func InRange(target time.Time, r Range) (in bool) {
 		log.Print("goclub/time: InRange(target time.Time, r Range) r.Begin can not  be after r.End, InRange() already replacement they")
 	}
 	// begin <= target <= end -> true
-	if ( begin.Before(target) || begin.Equal(target) ) &&
-		( target.Before(end) || target.Equal(end) ) {
+	if (begin.Before(target) || begin.Equal(target)) &&
+		(target.Before(end) || target.Equal(end)) {
 		in = true
 		return
 	}
 	return
 }
+
 type DateRange struct {
-	Begin  Date `note:"当日期是 2022-01-01 时等同于 Range{Begin: 2022-01-01 00:00:00}"`
-	End    Date `note:"当日期是 2022-01-03 时等同于 Range{End: 2022-01-03 23:59:59}"`
+	Begin Date `note:"当日期是 2022-01-01 时等同于 Range{Begin: 2022-01-01 00:00:00}"`
+	End   Date `note:"当日期是 2022-01-03 时等同于 Range{End: 2022-01-03 23:59:59}"`
 }
+
 func InRangeFromDate(target time.Time, r DateRange) (in bool) {
 	timeRange := Range{
 		Begin: FirstSecondOfDate(r.Begin.Time(target.Location())),
@@ -40,40 +43,45 @@ func InRangeFromDate(target time.Time, r DateRange) (in bool) {
 	}
 	return InRange(target, timeRange)
 }
+
 type Date struct {
-	Year int
+	Year  int
 	Month time.Month
-	Day int
+	Day   int
 }
-func NowDate(loc *time.Location) Date {
+
+func Today(loc *time.Location) Date {
 	year, month, day := time.Now().In(loc).Date()
 	return Date{
-		Year: year,
+		Year:  year,
 		Month: month,
-		Day: day,
+		Day:   day,
 	}
 }
 func NewDate(year int, month time.Month, day int) Date {
 	return Date{
-		year, month,day,
+		year, month, day,
 	}
 }
 func NewDateFromTime(t time.Time) Date {
 	return NewDate(t.Date())
 }
 func NewDateFromString(value string) (d Date, err error) {
-	t, err := time.Parse(LayoutDate, value) ; if err != nil {
+	t, err := time.Parse(LayoutDate, value)
+	if err != nil {
 		err = xerr.WithStack(err)
-	    return
+		return
 	}
 	return NewDateFromTime(t), nil
 }
 
 func (d *Date) UnmarshalJSON(b []byte) error {
-	value, err := strconv.Unquote(string(b)) ; if err != nil {
+	value, err := strconv.Unquote(string(b))
+	if err != nil {
 		return xerr.WithStack(err)
 	}
-	date, err := NewDateFromString(value) ; if err != nil {
+	date, err := NewDateFromString(value)
+	if err != nil {
 		return xerr.WithStack(err)
 	}
 	*d = date
@@ -84,7 +92,7 @@ func (d Date) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + d.String() + `"`), nil
 }
 func (d Date) Time(loc *time.Location) time.Time {
-	return time.Date(d.Year, d.Month, d.Day, 0,0,0,0, loc)
+	return time.Date(d.Year, d.Month, d.Day, 0, 0, 0, 0, loc)
 }
 func (d Date) LocalTime() time.Time {
 	return d.Time(time.Local)
@@ -96,7 +104,7 @@ func (d Date) ChinaTime() ChinaTime {
 	return NewChinaTime(d.Time(LocChina))
 }
 func (d Date) String() string {
-	return time.Date(d.Year, d.Month, d.Day, 0,0,0,0, time.UTC).Format(LayoutDate)
+	return time.Date(d.Year, d.Month, d.Day, 0, 0, 0, 0, time.UTC).Format(LayoutDate)
 }
 func (d Date) Value() (driver.Value, error) {
 	return d.String(), nil
@@ -110,9 +118,10 @@ func (d *Date) Scan(value interface{}) (err error) {
 		*d = NewDateFromTime(v)
 	default:
 		var date Date
-		date, err = NewDateFromString(fmt.Sprintf("%s", value)) ; if err != nil {
-		return
-	}
+		date, err = NewDateFromString(fmt.Sprintf("%s", value))
+		if err != nil {
+			return
+		}
 		*d = date
 	}
 	return
@@ -142,8 +151,9 @@ func (d *NullDate) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 	date := Date{}
-	err := date.UnmarshalJSON(b) ; if err != nil {
-	    return xerr.WithStack(err)
+	err := date.UnmarshalJSON(b)
+	if err != nil {
+		return xerr.WithStack(err)
 	}
 	*d = NullDate{
 		date:  date,
@@ -182,10 +192,10 @@ func (d *NullDate) Scan(value interface{}) error {
 }
 
 func LastSecondOfDate(t time.Time) time.Time {
-	y,m,d := t.Date()
-	return time.Date(y,m,d,23,59,59,999999999,t.Location())
+	y, m, d := t.Date()
+	return time.Date(y, m, d, 23, 59, 59, 999999999, t.Location())
 }
 func FirstSecondOfDate(t time.Time) time.Time {
-	y,m,d := t.Date()
-	return time.Date(y,m,d,0,0,0,0,t.Location())
+	y, m, d := t.Date()
+	return time.Date(y, m, d, 0, 0, 0, 0, t.Location())
 }
