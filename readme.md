@@ -57,6 +57,19 @@ return time.Date(y,m,d,0,0,0,0,t.Location())
 }
 ```
 
+## TomorrowFirstSecond
+
+明天第0秒,多用于 redis [PEXPIREAT](pexpireat)  
+
+```go
+sometime := time.Date(2022, 01, 01, 12, 12, 12, 88, xtime.LocChina)
+
+tomorrowFirstSecond := xtime.TomorrowFirstSecond(sometime)
+
+tomorrowFirstSecond.String() // 2022-01-02 00:00:00 +0800 CST
+tomorrowFirstSecond.UnixMilli() // int64(1641052800000)  or xtime.UnixMilli(tomorrowFirstSecond)
+```
+
 ## InRange & InRangeFromDate
 
 `InRange` 和 `InRangeFromDate` 可以判断一个时间或者日期是否在指定范围内.

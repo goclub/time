@@ -199,3 +199,7 @@ func FirstSecondOfDate(t time.Time) time.Time {
 	y, m, d := t.Date()
 	return time.Date(y, m, d, 0, 0, 0, 0, t.Location())
 }
+
+func TomorrowFirstSecond(t time.Time) time.Time {
+	return FirstSecondOfDate(t.AddDate(0, 0, 1))
+}

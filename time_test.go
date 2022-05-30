@@ -453,3 +453,13 @@ func TestFirstSecondOfDate(t *testing.T) {
 		return struct{}{}
 	}()
 }
+func TestTomorrowFirstSecond(t *testing.T) {
+	func() struct{} {
+		// -------------
+		sometime := time.Date(2022, 01, 01, 12, 12, 12, 88, xtime.LocChina)
+		assert.Equal(t, xtime.UnixMilli(xtime.TomorrowFirstSecond(sometime)), int64(1641052800000))
+		assert.Equal(t, xtime.TomorrowFirstSecond(sometime).String(), "2022-01-02 00:00:00 +0800 CST")
+		// -------------
+		return struct{}{}
+	}()
+}
