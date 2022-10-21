@@ -491,9 +491,9 @@ func TestDate_Sub(t *testing.T) {
 	func() struct{} {
 		// -------------
 		someDate := xtime.NewDate(2022, 10, 01)
-		assert.Equal(t, someDate.Sub(xtime.NewDate(2022, 10, 10)), int64(-9))
-		assert.Equal(t, someDate.Sub(xtime.NewDate(2022, 9, 30)), int64(1))
-		assert.Equal(t, someDate.Sub(xtime.NewDate(2023, 10, 01)), int64(-365))
+		assert.Equal(t, someDate.Sub(xtime.NewDate(2022, 10, 10)), int(-9))
+		assert.Equal(t, someDate.Sub(xtime.NewDate(2022, 9, 30)), int(1))
+		assert.Equal(t, someDate.Sub(xtime.NewDate(2023, 10, 01)), int(-365))
 		// -------------
 		return struct{}{}
 	}()
