@@ -463,3 +463,38 @@ func TestTomorrowFirstSecond(t *testing.T) {
 		return struct{}{}
 	}()
 }
+
+func TestDate_AddDate(t *testing.T) {
+	func() struct{} {
+		// -------------
+		someDate := xtime.NewDate(2022, 10, 01)
+		assert.Equal(t, someDate.AddDate(1, 0, 0).String(), "2023-10-01")
+		assert.Equal(t, someDate.AddDate(0, 1, 0).String(), "2022-11-01")
+		assert.Equal(t, someDate.AddDate(0, 0, 1).String(), "2022-10-02")
+
+		assert.Equal(t, someDate.AddDate(-1, 0, 0).String(), "2021-10-01")
+		assert.Equal(t, someDate.AddDate(0, -1, 0).String(), "2022-09-01")
+		assert.Equal(t, someDate.AddDate(0, 0, -1).String(), "2022-09-30")
+
+		assert.Equal(t, someDate.AddDate(1, 1, 0).String(), "2023-11-01")
+		assert.Equal(t, someDate.AddDate(1, 1, 1).String(), "2023-11-02")
+
+		assert.Equal(t, someDate.AddDate(-1, -1, 0).String(), "2021-09-01")
+		assert.Equal(t, someDate.AddDate(-1, -1, -1).String(), "2021-08-31")
+
+		// -------------
+		return struct{}{}
+	}()
+}
+
+func TestDate_Sub(t *testing.T) {
+	func() struct{} {
+		// -------------
+		someDate := xtime.NewDate(2022, 10, 01)
+		assert.Equal(t, someDate.Sub(xtime.NewDate(2022, 10, 10)), int64(-9))
+		assert.Equal(t, someDate.Sub(xtime.NewDate(2022, 9, 30)), int64(1))
+		assert.Equal(t, someDate.Sub(xtime.NewDate(2023, 10, 01)), int64(-365))
+		// -------------
+		return struct{}{}
+	}()
+}

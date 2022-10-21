@@ -5,6 +5,7 @@ import (
 	"fmt"
 	xerr "github.com/goclub/error"
 	"log"
+	"math"
 	"strconv"
 	"time"
 )
@@ -125,6 +126,15 @@ func (d *Date) Scan(value interface{}) (err error) {
 		*d = date
 	}
 	return
+}
+
+func (d Date) AddDate(years int, months int, days int) (date Date) {
+	return NewDateFromTime(d.UTCTime().AddDate(years, months, days))
+}
+
+func (d Date) Sub(u Date) (days int64) {
+	// 减法不会出现精度
+	return int64(math.Round(d.UTCTime().Sub(u.UTCTime()).Hours())) / 24
 }
 
 type NullDate struct {

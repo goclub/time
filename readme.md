@@ -68,6 +68,11 @@ tomorrowFirstSecond := xtime.TomorrowFirstSecond(sometime)
 
 tomorrowFirstSecond.String() // 2022-01-02 00:00:00 +0800 CST
 tomorrowFirstSecond.UnixMilli() // int64(1641052800000)  or xtime.UnixMilli(tomorrowFirstSecond)
+
+// 计算现在距离明天00:00:00的时间有多少
+now := time.Now().In(xtime.LocChina)
+xtime.TomorrowFirstSecond(now).Sub(now)
+
 ```
 
 ## InRange & InRangeFromDate
@@ -93,4 +98,3 @@ in := xtime.InRange(target, xtime.Range{
     End:    end,
 })
 ```
-
