@@ -1,6 +1,7 @@
 package xtime_test
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	_ "github.com/go-sql-driver/mysql"
@@ -494,6 +495,56 @@ func TestDate_Sub(t *testing.T) {
 		assert.Equal(t, someDate.Sub(xtime.NewDate(2022, 10, 10)), int(-9))
 		assert.Equal(t, someDate.Sub(xtime.NewDate(2022, 9, 30)), int(1))
 		assert.Equal(t, someDate.Sub(xtime.NewDate(2023, 10, 01)), int(-365))
+		// -------------
+		return struct{}{}
+	}()
+}
+
+func TestDate_FirstDateOfMonth(t *testing.T) {
+	func() struct{} {
+		// -------------
+		var err error
+		_ = err
+		ctx := context.Background()
+		_ = ctx
+		{
+			someDate := xtime.NewDate(2022, 11, 11)
+			assert.Equal(t, someDate.FirstDateOfMonth(), xtime.NewDate(2022, 11, 01))
+		}
+		{
+			someDate := xtime.NewDate(2022, 11, 01)
+			assert.Equal(t, someDate.FirstDateOfMonth(), xtime.NewDate(2022, 11, 01))
+		}
+		{
+			someDate := xtime.NewDate(2022, 11, 30)
+			assert.Equal(t, someDate.FirstDateOfMonth(), xtime.NewDate(2022, 11, 01))
+		}
+
+		// -------------
+		return struct{}{}
+	}()
+}
+
+func TestDate_LastDateOfMonth(t *testing.T) {
+	func() struct{} {
+		// -------------
+		var err error
+		_ = err
+		ctx := context.Background()
+		_ = ctx
+		{
+			someDate := xtime.NewDate(2022, 11, 11)
+			assert.Equal(t, someDate.LastDateOfMonth(), xtime.NewDate(2022, 11, 30))
+		}
+		{
+			someDate := xtime.NewDate(2022, 11, 01)
+			assert.Equal(t, someDate.LastDateOfMonth(), xtime.NewDate(2022, 11, 30))
+		}
+		{
+			someDate := xtime.NewDate(2022, 11, 30)
+			assert.Equal(t, someDate.FirstDateOfMonth(), xtime.NewDate(2022, 11, 30))
+		}
+
 		// -------------
 		return struct{}{}
 	}()

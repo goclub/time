@@ -133,8 +133,17 @@ func (d Date) AddDate(years int, months int, days int) (date Date) {
 }
 
 func (d Date) Sub(u Date) (days int) {
-	// 减法不会出现精度
 	return int(math.Round(d.UTCTime().Sub(u.UTCTime()).Hours())) / 24
+}
+
+// FirstDateOfMonth 2022-11-11 => 2022-11-01
+func (d Date) FirstDateOfMonth() (first Date) {
+	return NewDate(d.Year, d.Month, 1)
+}
+
+// LastDateOfMonth 2022-11-11 => 2022-11-30
+func (d Date) LastDateOfMonth() (first Date) {
+	return d.FirstDateOfMonth().AddDate(0, 1, -1)
 }
 
 type NullDate struct {
@@ -201,15 +210,19 @@ func (d *NullDate) Scan(value interface{}) error {
 	return d.date.Scan(value)
 }
 
+// LastSecondOfDate 2022-11-11 xx:xx:xx => 2022-11-11 23:59:59.999
 func LastSecondOfDate(t time.Time) time.Time {
 	y, m, d := t.Date()
 	return time.Date(y, m, d, 23, 59, 59, 999999999, t.Location())
 }
+
+// FirstSecondOfDate 2022-11-11 xx:xx:xx => 2022-11-11 00:00:00
 func FirstSecondOfDate(t time.Time) time.Time {
 	y, m, d := t.Date()
 	return time.Date(y, m, d, 0, 0, 0, 0, t.Location())
 }
 
+// TomorrowFirstSecond 2022-11-11 xx:xx:xx => 2022-11-12 00:00:00
 func TomorrowFirstSecond(t time.Time) time.Time {
 	return FirstSecondOfDate(t.AddDate(0, 0, 1))
 }
