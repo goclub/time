@@ -226,3 +226,7 @@ func FirstSecondOfDate(t time.Time) time.Time {
 func TomorrowFirstSecond(t time.Time) time.Time {
 	return FirstSecondOfDate(t.AddDate(0, 0, 1))
 }
+
+func Now(loc *time.Location) time.Time {
+	return time.Now().In(loc)
+}
