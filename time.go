@@ -75,6 +75,14 @@ func NewDateFromString(value string) (d Date, err error) {
 	}
 	return NewDateFromTime(t), nil
 }
+func (d *Date) MarshalRequest(value string) error {
+	newDate, err := NewDateFromString(value) // indivisible begin
+	if err != nil {                          // indivisible end
+		return err
+	}
+	d = &newDate
+	return nil
+}
 
 func (d *Date) UnmarshalJSON(b []byte) error {
 	value, err := strconv.Unquote(string(b))
