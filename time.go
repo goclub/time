@@ -75,6 +75,13 @@ func NewDateFromString(value string) (d Date, err error) {
 	}
 	return NewDateFromTime(t), nil
 }
+func (d Date) IsZero() bool {
+	if d.Year == 0 && d.Month == 0 && d.Day == 0 {
+		return true
+	}
+	return false
+}
+
 func (d *Date) MarshalRequest(value string) error {
 	newDate, err := NewDateFromString(value) // indivisible begin
 	if err != nil {                          // indivisible end
