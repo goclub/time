@@ -242,6 +242,11 @@ func TomorrowFirstSecond(t time.Time) time.Time {
 	return FirstSecondOfDate(t.AddDate(0, 0, 1))
 }
 
+// TomorrowFirstSecondDuration  2022-11-11 23:59:50   => 10s
+func TomorrowFirstSecondDuration(t time.Time) time.Duration {
+	return TomorrowFirstSecond(t).Sub(t)
+}
+
 func Now(loc *time.Location) time.Time {
 	return time.Now().In(loc)
 }

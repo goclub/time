@@ -464,6 +464,15 @@ func TestTomorrowFirstSecond(t *testing.T) {
 		return struct{}{}
 	}()
 }
+func TestTomorrowFirstSecondDuration(t *testing.T) {
+	func() struct{} {
+		// -------------
+		sometime := time.Date(2022, 11, 11, 23, 59, 50, 00, xtime.LocChina)
+		assert.Equal(t, xtime.TomorrowFirstSecondDuration(sometime), time.Second*10)
+		// -------------
+		return struct{}{}
+	}()
+}
 
 func TestDate_AddDate(t *testing.T) {
 	func() struct{} {
