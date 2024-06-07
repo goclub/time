@@ -28,7 +28,7 @@ Format 也有相同的问题。
 
 故此 goclub/time 提供了一些指定时区的 parse 和 format，目前主要是 China 时区 `time.FixedZone("CST", 8*3600)`
 
-当 json 传递的时间格式不是 RFC3339 而是中国时区年月日时分秒 `2006-01-02 15:04:05`，可以使用 `xtime.ChinaTime` 解析和转换
+当 json 传递的时间格式不是 RFC3339 而是中国时区年月日时分秒 `2006-01-02 15:04:05`，可以使用 `xtime.ChinaTime` 或者 `xtime.ChinaRange` 解析和转换
 
 ## Date
 

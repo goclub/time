@@ -7,6 +7,19 @@ import (
 	"time"
 )
 
+func TestChinaRange(t *testing.T) {
+	{
+		type Request struct {
+			Range ChinaRange `json:"range"`
+		}
+		req := Request{}
+		err := json.Unmarshal([]byte(`{"range":{"start":"2024-06-07 10:34:40","end":"2024-06-10 11:22:33"}}`), &req)
+		assert.NoError(t, err)
+
+		assert.Equal(t, req.Range.Start.In(time.FixedZone("CST", 8*3600)).String(), `2024-06-07 10:34:40 +0800 CST`)
+		assert.Equal(t, req.Range.End.In(time.FixedZone("CST", 8*3600)).String(), `2024-06-10 11:22:33 +0800 CST`)
+	}
+}
 func TestChinaTime(t *testing.T) {
 	String := func(v interface{}) string {
 		data, err := json.Marshal(v)

@@ -19,3 +19,8 @@ func (t *ChinaTime) UnmarshalJSON(b []byte) error {
 	t.Time = v
 	return err
 }
+
+type ChinaRange struct {
+	Start ChinaTime `json:"start"`
+	End   ChinaTime `json:"end"`
+}

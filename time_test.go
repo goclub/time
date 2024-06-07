@@ -551,7 +551,7 @@ func TestDate_LastDateOfMonth(t *testing.T) {
 		}
 		{
 			someDate := xtime.NewDate(2022, 11, 30)
-			assert.Equal(t, someDate.FirstDateOfMonth(), xtime.NewDate(2022, 11, 30))
+			assert.Equal(t, someDate.FirstDateOfMonth(), xtime.NewDate(2022, 11, 1))
 		}
 
 		// -------------
