@@ -54,7 +54,7 @@ func TestInRangeTime2(t *testing.T) {
 		target := item.Time[1]
 		end := item.Time[2]
 		in := xtime.InRange(target, xtime.Range{
-			Begin: begin,
+			Start: begin,
 			End:   end,
 		})
 		assert.Equalf(t, in, item.In, "Time: []time.Time{t%d, t%d, t%d}, %v, }", begin.Second(), target.Second(), end.Second(), item.In)
@@ -225,7 +225,7 @@ func TestInRangeTime(t *testing.T) {
 
 	for k, v := range dataList {
 		in := xtime.InRange(v.Target, xtime.Range{
-			Begin: v.Begin,
+			Start: v.Begin,
 			End:   v.End,
 		})
 		assert.Equal(t, v.In, in, k+1)

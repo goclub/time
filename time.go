@@ -11,17 +11,17 @@ import (
 )
 
 type Range struct {
-	Begin time.Time
+	Start time.Time
 	End   time.Time
 }
 
 func InRange(target time.Time, r Range) (in bool) {
-	begin := r.Begin
+	begin := r.Start
 	end := r.End
-	if r.Begin.After(r.End) {
+	if r.Start.After(r.End) {
 		begin = r.End
-		end = r.Begin
-		log.Print("goclub/time: InRange(target time.Time, r Range) r.Begin can not  be after r.End, InRange() already replacement they")
+		end = r.Start
+		log.Print("goclub/time: InRange(target time.Time, r Range) r.Start can not  be after r.End, InRange() already replacement they")
 	}
 	// begin <= target <= end -> true
 	if (begin.Before(target) || begin.Equal(target)) &&
@@ -33,13 +33,13 @@ func InRange(target time.Time, r Range) (in bool) {
 }
 
 type DateRange struct {
-	Begin Date `note:"当日期是 2022-01-01 时等同于 Range{Begin: 2022-01-01 00:00:00}"`
+	Begin Date `note:"当日期是 2022-01-01 时等同于 Range{Start: 2022-01-01 00:00:00}"`
 	End   Date `note:"当日期是 2022-01-03 时等同于 Range{End: 2022-01-03 23:59:59}"`
 }
 
 func InRangeFromDate(target time.Time, r DateRange) (in bool) {
 	timeRange := Range{
-		Begin: FirstSecondOfDate(r.Begin.Time(target.Location())),
+		Start: FirstSecondOfDate(r.Begin.Time(target.Location())),
 		End:   LastSecondOfDate(r.End.Time(target.Location())),
 	}
 	return InRange(target, timeRange)
