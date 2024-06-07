@@ -1,7 +1,7 @@
 package xtime_test
 
 import (
-	xjson "github.com/goclub/json"
+	json "encoding/json"
 	xtime "github.com/goclub/time"
 	"log"
 	"testing"
@@ -66,13 +66,13 @@ func ExampleJSON_RFC3339() {
 	request := struct {
 		Time time.Time `json:"time"`
 	}{}
-	err := xjson.Unmarshal([]byte(`{"time": "2020-12-31T23:23:23Z"}`), &request) ; if err != nil {panic(err)}
+	err := json.Unmarshal([]byte(`{"time": "2020-12-31T23:23:23Z"}`), &request) ; if err != nil {panic(err)}
 	log.Printf("request: %+v", request) // request: {Time:2020-12-31 23:23:23 +0000 UTC}
 
 	response := struct {
 		Time time.Time `json:"time"`
 	}{Time: time.Date(2020,12,31,23,23,23, 0,time.UTC)}
-	data, err := xjson.Marshal(response) ; if err != nil {panic(err)}
+	data, err := json.Marshal(response) ; if err != nil {panic(err)}
 	log.Print("response json : " + string(data)) // response json : {"time":"2020-12-31T23:23:23Z"}
 }
 func ExampleChinaTime () {
@@ -80,7 +80,7 @@ func ExampleChinaTime () {
 	request := struct {
 		Time xtime.ChinaTime `json:"time"`
 	}{}
-	err := xjson.Unmarshal([]byte(`{"time": "2020-12-31 23:23:23"}`), &request) ; if err != nil {panic(err)}
+	err := json.Unmarshal([]byte(`{"time": "2020-12-31 23:23:23"}`), &request) ; if err != nil {panic(err)}
 	log.Printf("request: %+v", request) // request: {Time:2020-12-31 23:23:23 +0800 CST}
 	var sometime time.Time
 	sometime = request.Time.Time
@@ -88,7 +88,7 @@ func ExampleChinaTime () {
 	response := struct {
 		Time xtime.ChinaTime `json:"time"`
 	}{Time: xtime.NewChinaTime(time.Date(2020,12,31,23,23,23, 0,time.UTC))}
-	data, err := xjson.Marshal(response) ; if err != nil {panic(err)}
+	data, err := json.Marshal(response) ; if err != nil {panic(err)}
 	log.Print("response json : " + string(data)) // response json : {"time":"2021-01-01 07:23:23"}
 }
 func TestExample(t *testing.T) {

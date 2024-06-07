@@ -1,15 +1,18 @@
 package xtime
 
 import (
-	xjson "github.com/goclub/json"
+	json "encoding/json"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
-		
+
 func TestChinaTime(t *testing.T) {
-	String := func (v interface{}) string {
-		data, err := xjson.Marshal(v) ; if err != nil {panic(err)}
+	String := func(v interface{}) string {
+		data, err := json.Marshal(v)
+		if err != nil {
+			panic(err)
+		}
 		return string(data)
 	}
 	{
@@ -32,7 +35,7 @@ func TestChinaTime(t *testing.T) {
 			Time ChinaTime `db:"time"`
 		}
 		req := Request{}
-		err := xjson.Unmarshal([]byte(`{"time":"2020-07-31 15:37:44"}`), &req)
+		err := json.Unmarshal([]byte(`{"time":"2020-07-31 15:37:44"}`), &req)
 		assert.NoError(t, err)
 		assert.Equal(t, req.Time.In(time.FixedZone("CST", 8*3600)).String(), "2020-07-31 15:37:44 +0800 CST")
 	}
