@@ -8,6 +8,7 @@ import (
 	xtime "github.com/goclub/time"
 	"github.com/stretchr/testify/assert"
 	"net/url"
+	"strings"
 	"testing"
 	"time"
 )
@@ -557,4 +558,187 @@ func TestDate_LastDateOfMonth(t *testing.T) {
 		// -------------
 		return struct{}{}
 	}()
+}
+
+func TestSplitRange(t *testing.T) {
+	type Case struct {
+		Name   string
+		Days   uint
+		Begin  xtime.Date
+		End    xtime.Date
+		Result []xtime.DateRange
+		Err    error
+	}
+	cases := []Case{
+		{
+			"0 3",
+			0,
+			xtime.NewDate(2000, 1, 1),
+			xtime.NewDate(2000, 1, 3),
+			[]xtime.DateRange{
+				{xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 2)},
+				{xtime.NewDate(2000, 1, 3), xtime.NewDate(2000, 1, 3)},
+			},
+			nil,
+		},
+		{
+			"1 3",
+			0,
+			xtime.NewDate(2000, 1, 1),
+			xtime.NewDate(2000, 1, 3),
+			[]xtime.DateRange{
+				{xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 2)},
+				{xtime.NewDate(2000, 1, 3), xtime.NewDate(2000, 1, 3)},
+			},
+			nil,
+		},
+		{
+			"2 3",
+			2,
+			xtime.NewDate(2000, 1, 1),
+			xtime.NewDate(2000, 1, 3),
+			[]xtime.DateRange{
+				{xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 3)},
+			},
+			nil,
+		},
+		{
+			"3 3",
+			3,
+			xtime.NewDate(2000, 1, 1),
+			xtime.NewDate(2000, 1, 3),
+			[]xtime.DateRange{
+				{xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 3)},
+			},
+			nil,
+		},
+		{
+			"4 3",
+			4,
+			xtime.NewDate(2000, 1, 1),
+			xtime.NewDate(2000, 1, 3),
+			[]xtime.DateRange{
+				{xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 3)},
+			},
+			nil,
+		},
+		{
+			"2 6",
+			2,
+			xtime.NewDate(2000, 1, 1),
+			xtime.NewDate(2000, 1, 6),
+			[]xtime.DateRange{
+				{xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 3)},
+				{xtime.NewDate(2000, 1, 4), xtime.NewDate(2000, 1, 6)},
+			},
+			nil,
+		},
+		{
+			"2 7",
+			2,
+			xtime.NewDate(2000, 1, 1),
+			xtime.NewDate(2000, 1, 7),
+			[]xtime.DateRange{
+				{xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 3)},
+				{xtime.NewDate(2000, 1, 4), xtime.NewDate(2000, 1, 6)},
+				{xtime.NewDate(2000, 1, 7), xtime.NewDate(2000, 1, 7)},
+			},
+			nil,
+		},
+		{
+			"2 8",
+			2,
+			xtime.NewDate(2000, 1, 1),
+			xtime.NewDate(2000, 1, 8),
+			[]xtime.DateRange{
+				{xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 3)},
+				{xtime.NewDate(2000, 1, 4), xtime.NewDate(2000, 1, 6)},
+				{xtime.NewDate(2000, 1, 7), xtime.NewDate(2000, 1, 8)},
+			},
+			nil,
+		},
+		{
+			"跨月 10 40",
+			10,
+			xtime.NewDate(2000, 1, 1),
+			xtime.NewDate(2000, 2, 8),
+			[]xtime.DateRange{
+				{xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 11)},
+				{xtime.NewDate(2000, 1, 12), xtime.NewDate(2000, 1, 22)},
+				{xtime.NewDate(2000, 1, 23), xtime.NewDate(2000, 2, 2)},
+				{xtime.NewDate(2000, 2, 3), xtime.NewDate(2000, 2, 8)},
+			},
+			nil,
+		},
+		{
+			"跨月 33 40",
+			33,
+			xtime.NewDate(2000, 1, 1),
+			xtime.NewDate(2000, 2, 8),
+			[]xtime.DateRange{
+				{xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 2, 3)},
+				{xtime.NewDate(2000, 2, 4), xtime.NewDate(2000, 2, 8)},
+			},
+			nil,
+		},
+		{
+			"跨年 350 400",
+			350,
+			xtime.NewDate(2000, 1, 1),
+			xtime.NewDate(2001, 3, 1),
+			[]xtime.DateRange{
+				{xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 12, 16)},
+				{xtime.NewDate(2000, 12, 17), xtime.NewDate(2001, 3, 1)},
+			},
+			nil,
+		},
+	}
+	DateRangeToString := func(rs []xtime.DateRange) string {
+		t := []string{}
+		for _, r := range rs {
+			t = append(t, r.Begin.String()+"~"+r.End.String())
+		}
+		return strings.Join(t, " ")
+	}
+	for _, c := range cases {
+		r := xtime.DateRange{c.Begin, c.End}
+		result := xtime.SplitRange(c.Days, r)
+		assert.Equal(t, DateRangeToString(c.Result), DateRangeToString(result), c.Name)
+	}
+}
+
+func TestDateRange_Validator(t *testing.T) {
+	// Begin=End
+	{
+		err := xtime.DateRange{}.Validator()
+		assert.NoError(t, err)
+	}
+	// Begin>End error
+	{
+		err := xtime.DateRange{
+			xtime.NewDate(2000, 1, 1), xtime.Date{},
+		}.Validator()
+		assert.Errorf(t, err, "goclub/time: DateRange.Begin can not be after DateRange.End")
+	}
+	// Begin<End
+	{
+		err := xtime.DateRange{
+			xtime.Date{}, xtime.NewDate(2000, 1, 1),
+		}.Validator()
+		assert.NoError(t, err)
+	}
+	// Begin=End
+	{
+		err := xtime.DateRange{
+			xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 1),
+		}.Validator()
+		assert.NoError(t, err)
+	}
+	// Begin<End
+	{
+		err := xtime.DateRange{
+			xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 2),
+		}.Validator()
+		assert.NoError(t, err)
+	}
 }

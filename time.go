@@ -37,6 +37,13 @@ type DateRange struct {
 	End   Date `note:"当日期是 2022-01-03 时等同于 Range{End: 2022-01-03 23:59:59}"`
 }
 
+func (r DateRange) Validator(err ...error) error {
+	if r.Begin.After(r.End) {
+		return xerr.New("goclub/time: DateRange.Begin can not be after DateRange.")
+	}
+	return nil
+}
+
 func InRangeFromDate(target time.Time, r DateRange) (in bool) {
 	timeRange := Range{
 		Start: FirstSecondOfDate(r.Begin.Time(target.Location())),
@@ -160,6 +167,15 @@ func (d Date) FirstDateOfMonth() (first Date) {
 func (d Date) LastDateOfMonth() (first Date) {
 	return d.FirstDateOfMonth().AddDate(0, 1, -1)
 }
+func (d Date) After(t Date) bool {
+	return d.UTCTime().After(t.UTCTime())
+}
+func (d Date) Before(t Date) bool {
+	return d.UTCTime().Before(t.UTCTime())
+}
+func (d Date) Equal(t Date) bool {
+	return d == t
+}
 
 type NullDate struct {
 	date  Date
@@ -249,4 +265,33 @@ func TomorrowFirstSecondDuration(t time.Time) time.Duration {
 
 func Now(loc *time.Location) time.Time {
 	return time.Now().In(loc)
+}
+
+func SplitRange(days uint, r DateRange) (splitRanges []DateRange) {
+	if days == 0 {
+		days = 1
+	}
+	splitRanges = []DateRange{}
+	// 边界: 2022-01-01~2022-01-01
+	if r.Begin.Equal(r.End) {
+		splitRanges = append(splitRanges, r)
+		return
+	}
+	// 边界: 2022-01-02~2022-01-01
+	if err := r.Validator(); err != nil {
+		// 格式错误必须 panic 否则即使当前逻辑不出错后续逻辑也会出错
+		panic(err)
+	}
+	slow := r.Begin
+	for {
+		itemEnd := slow.AddDate(0, 0, int(days))
+		if itemEnd.Before(r.End) {
+			splitRanges = append(splitRanges, DateRange{slow, itemEnd})
+			slow = itemEnd.AddDate(0, 0, 1)
+		} else {
+			splitRanges = append(splitRanges, DateRange{slow, r.End})
+			break
+		}
+	}
+	return splitRanges
 }
