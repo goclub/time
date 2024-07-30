@@ -284,7 +284,7 @@ func SplitRange(days uint, r DateRange) (splitRanges []DateRange) {
 	}
 	slow := r.Begin
 	for {
-		itemEnd := slow.AddDate(0, 0, int(days))
+		itemEnd := slow.AddDate(0, 0, int(days-1))
 		if itemEnd.Before(r.End) {
 			splitRanges = append(splitRanges, DateRange{slow, itemEnd})
 			slow = itemEnd.AddDate(0, 0, 1)
