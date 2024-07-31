@@ -4,7 +4,6 @@ import (
 	"database/sql/driver"
 	"fmt"
 	xerr "github.com/goclub/error"
-	"log"
 	"math"
 	"strconv"
 	"time"
@@ -15,13 +14,18 @@ type Range struct {
 	End   time.Time
 }
 
+func (r Range) Validator(err ...error) error {
+	if r.Start.After(r.End) {
+		return xerr.New("goclub/time: Range.Start can not be after Range.End")
+	}
+	return nil
+}
 func InRange(target time.Time, r Range) (in bool) {
 	begin := r.Start
 	end := r.End
-	if r.Start.After(r.End) {
-		begin = r.End
-		end = r.Start
-		log.Print("goclub/time: InRange(target time.Time, r Range) r.Start can not  be after r.End, InRange() already replacement they")
+	// 开始结束时间顺序错误,在后续逻辑可能造成验证错误
+	if err := r.Validator(); err != nil {
+		panic(err)
 	}
 	// begin <= target <= end -> true
 	if (begin.Before(target) || begin.Equal(target)) &&
@@ -33,20 +37,20 @@ func InRange(target time.Time, r Range) (in bool) {
 }
 
 type DateRange struct {
-	Begin Date `note:"当日期是 2022-01-01 时等同于 Range{Start: 2022-01-01 00:00:00}"`
+	Start Date `note:"当日期是 2022-01-01 时等同于 Range{Start: 2022-01-01 00:00:00}"`
 	End   Date `note:"当日期是 2022-01-03 时等同于 Range{End: 2022-01-03 23:59:59}"`
 }
 
 func (r DateRange) Validator(err ...error) error {
-	if r.Begin.After(r.End) {
-		return xerr.New("goclub/time: DateRange.Begin can not be after DateRange.")
+	if r.Start.After(r.End) {
+		return xerr.New("goclub/time: DateRange.Start can not be after DateRange.End")
 	}
 	return nil
 }
 
 func InRangeFromDate(target time.Time, r DateRange) (in bool) {
 	timeRange := Range{
-		Start: FirstSecondOfDate(r.Begin.Time(target.Location())),
+		Start: FirstSecondOfDate(r.Start.Time(target.Location())),
 		End:   LastSecondOfDate(r.End.Time(target.Location())),
 	}
 	return InRange(target, timeRange)
@@ -273,7 +277,7 @@ func SplitRange(days uint, r DateRange) (splitRanges []DateRange) {
 	}
 	splitRanges = []DateRange{}
 	// 边界: 2022-01-01~2022-01-01
-	if r.Begin.Equal(r.End) {
+	if r.Start.Equal(r.End) {
 		splitRanges = append(splitRanges, r)
 		return
 	}
@@ -282,7 +286,7 @@ func SplitRange(days uint, r DateRange) (splitRanges []DateRange) {
 		// 格式错误必须 panic 否则即使当前逻辑不出错后续逻辑也会出错
 		panic(err)
 	}
-	slow := r.Begin
+	slow := r.Start
 	for {
 		itemEnd := slow.AddDate(0, 0, int(days-1))
 		if itemEnd.Before(r.End) {

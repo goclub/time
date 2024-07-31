@@ -106,16 +106,17 @@ in := xtime.InRange(target, xtime.Range{
 用来满足一些业务场景中希望将长跨越日期改成短跨度日期后分段查询的需求.
 
 ```go
-days := 10
+var days uint = 10
 splitDateRanges := xtime.SplitDateRange(days, xtime.DateRange{
     Begin:  xtime.NewDate(2000,1,1),
     End:    xtime.NewDate(2000,2,8),
 })
 //splitDateRanges:
 //[
-//    2000-01-01~2000-01-11
-//    2000-01-12~2000-01-22
-//    2000-01-23~2000-02-02
-//    2000-02-03~2000-02-08
+//    2000-01-01~2000-01-10
+//    2000-01-11~2000-01-20
+//    2000-01-21~2000-01-30
+//    2000-01-31~2000-02-09
+//    2000-02-10~2000-02-11
 //]
 ```

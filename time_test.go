@@ -45,10 +45,6 @@ func TestInRangeTime2(t *testing.T) {
 		{[]time.Time{t2, t3, t4}, true},
 		{[]time.Time{t2, t4, t4}, true},
 		{[]time.Time{t2, t5, t4}, false},
-
-		// replacement begin & end
-		{[]time.Time{t3, t2, t1}, true},
-		{[]time.Time{t3, t5, t1}, false},
 	}
 	for _, item := range data {
 		begin := item.Time[0]
@@ -61,6 +57,7 @@ func TestInRangeTime2(t *testing.T) {
 		assert.Equalf(t, in, item.In, "Time: []time.Time{t%d, t%d, t%d}, %v, }", begin.Second(), target.Second(), end.Second(), item.In)
 	}
 }
+
 func TestInDateRangeTime(t *testing.T) {
 	// 2000-01-01
 	t1 := time.Date(2000, 1, 1, 0, 0, 0, 0, time.Local)
@@ -92,17 +89,13 @@ func TestInDateRangeTime(t *testing.T) {
 		{[]time.Time{t2, t3, t4}, true},
 		{[]time.Time{t2, t4, t4}, true},
 		{[]time.Time{t2, t5, t4}, false},
-
-		// replacement begin & end
-		{[]time.Time{t3, t2, t1}, true},
-		{[]time.Time{t3, t5, t1}, false},
 	}
 	for _, item := range data {
 		begin := item.Time[0]
 		target := item.Time[1]
 		end := item.Time[2]
 		in := xtime.InRangeFromDate(target, xtime.DateRange{
-			Begin: xtime.NewDateFromTime(begin),
+			Start: xtime.NewDateFromTime(begin),
 			End:   xtime.NewDateFromTime(end),
 		})
 		assert.Equalf(t, in, item.In, "Date: []time.Time{t%d, t%d, t%d}, %v, }", begin.Second(), target.Second(), end.Second(), item.In)
@@ -160,14 +153,14 @@ func TestInRangeTime(t *testing.T) {
 			In: true,
 		},
 		// 1 in 6 begin>end
-		{
-			InRangeTimeData: InRangeTimeData{
-				Begin:  time4,
-				End:    time2,
-				Target: time3,
-			},
-			In: true,
-		},
+		//{
+		//	InRangeTimeData: InRangeTimeData{
+		//		Begin:  time4,
+		//		End:    time2,
+		//		Target: time3,
+		//	},
+		//	In: true,
+		//},
 		// 2 F in left 4 begin=end
 		{
 			InRangeTimeData: InRangeTimeData{
@@ -187,14 +180,14 @@ func TestInRangeTime(t *testing.T) {
 			In: false,
 		},
 		// 2 F in left 6 begin>end
-		{
-			InRangeTimeData: InRangeTimeData{
-				Begin:  time4,
-				End:    time2,
-				Target: time1,
-			},
-			In: false,
-		},
+		//{
+		//	InRangeTimeData: InRangeTimeData{
+		//		Begin:  time4,
+		//		End:    time2,
+		//		Target: time1,
+		//	},
+		//	In: false,
+		//},
 		// 3 F in right 4 begin=end
 		{
 			InRangeTimeData: InRangeTimeData{
@@ -214,14 +207,14 @@ func TestInRangeTime(t *testing.T) {
 			In: false,
 		},
 		// 3 F in right 6 begin>end
-		{
-			InRangeTimeData: InRangeTimeData{
-				Begin:  time4,
-				End:    time2,
-				Target: time5,
-			},
-			In: false,
-		},
+		//{
+		//	InRangeTimeData: InRangeTimeData{
+		//		Begin:  time4,
+		//		End:    time2,
+		//		Target: time5,
+		//	},
+		//	In: false,
+		//},
 	}
 
 	for k, v := range dataList {
@@ -703,7 +696,7 @@ func TestSplitRange(t *testing.T) {
 	DateRangeToString := func(rs []xtime.DateRange) string {
 		t := []string{}
 		for _, r := range rs {
-			t = append(t, r.Begin.String()+"~"+r.End.String())
+			t = append(t, r.Start.String()+"~"+r.End.String())
 		}
 		return strings.Join(t, " ")
 	}
@@ -715,36 +708,63 @@ func TestSplitRange(t *testing.T) {
 }
 
 func TestDateRange_Validator(t *testing.T) {
-	// Begin=End
+	// Start=End
 	{
 		err := xtime.DateRange{}.Validator()
 		assert.NoError(t, err)
 	}
-	// Begin>End error
+	// Start>End error
 	{
 		err := xtime.DateRange{
 			xtime.NewDate(2000, 1, 1), xtime.Date{},
 		}.Validator()
-		assert.Errorf(t, err, "goclub/time: DateRange.Begin can not be after DateRange.End")
+		assert.Errorf(t, err, "goclub/time: DateRange.Start can not be after DateRange.End")
 	}
-	// Begin<End
+	// Start<End
 	{
 		err := xtime.DateRange{
 			xtime.Date{}, xtime.NewDate(2000, 1, 1),
 		}.Validator()
 		assert.NoError(t, err)
 	}
-	// Begin=End
+	// Start=End
 	{
 		err := xtime.DateRange{
 			xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 1),
 		}.Validator()
 		assert.NoError(t, err)
 	}
-	// Begin<End
+	// Start<End
 	{
 		err := xtime.DateRange{
 			xtime.NewDate(2000, 1, 1), xtime.NewDate(2000, 1, 2),
+		}.Validator()
+		assert.NoError(t, err)
+	}
+}
+
+func TestRange_Validator(t *testing.T) {
+	// start > end
+	{
+		err := xtime.Range{
+			time.Date(2000, 1, 2, 0, 0, 1, 0, time.Local),
+			time.Date(2000, 1, 1, 0, 0, 1, 0, time.Local),
+		}.Validator()
+		assert.Errorf(t, err, "goclub/time: Range.Start can not be after Range.End")
+	}
+	// start = end
+	{
+		err := xtime.Range{
+			time.Date(2000, 1, 1, 0, 0, 1, 0, time.Local),
+			time.Date(2000, 1, 1, 0, 0, 1, 0, time.Local),
+		}.Validator()
+		assert.NoError(t, err)
+	}
+	// start < end
+	{
+		err := xtime.Range{
+			time.Date(2000, 1, 1, 0, 0, 1, 0, time.Local),
+			time.Date(2000, 1, 2, 0, 0, 1, 0, time.Local),
 		}.Validator()
 		assert.NoError(t, err)
 	}
